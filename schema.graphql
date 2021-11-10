@@ -1,0 +1,101 @@
+schema {
+    query: Query
+}
+
+type Intersection {
+    id: ID
+    region: Int
+    revision: Int
+    status: Int
+    moy: Int
+    timestamp: Int
+    speed_limits: [SpeedLimit]
+}
+
+type IntersectionMap {
+    position: Position
+    vehicle_lanes: [Lane]
+    bike_lanes: [Lane]
+    crosswalks: [Lane]
+}
+
+type IntersectionState {
+    signal_group: ID!
+    event_state: String
+    min_end_time: Int
+    max_end_time: Int
+    likely_time: Int
+    confidence: Int
+}
+
+type IntersectionMetaResult {
+    success: Boolean!
+    errors: [String]
+    intersections: [Intersection]
+}
+
+type IntersectionStateResult {
+    success: Boolean!
+    errors: [String]
+    states: [IntersectionState]
+}
+
+type IntersectionMapResult {
+    success: Boolean!
+    errors: [String]
+    map: IntersectionMap
+}
+
+type Offset {
+    x: Int!
+    y: Int!
+}
+
+type Position {
+    lat: Int!
+    long: Int!
+}
+
+type SpeedLimit {
+    type: String!
+    speed: Int!
+}
+
+type Lane {
+    id: ID!
+    attributes: LaneAttributes
+    nodes: [Node]
+    connects_to: ConnectsTo
+}
+
+type LaneAttributes {
+    ingress_approach: Int
+    egress_approach: Int
+    directional_use: String
+    shared_with: Int
+    maneuvers: Int
+}
+
+type Node {
+    offset: Offset
+    d_width: Int
+}
+
+type ConnectsTo {
+    lane: ID!
+    maneuver: Int
+    signal_group: Int
+}
+
+type Query {
+    intersections_meta: IntersectionMetaResult!
+    intersection_state(intersectionId: ID!): IntersectionStateResult!
+    intersection_map(intersectionId: ID!): IntersectionMapResult!
+}
+
+type DeleteTodoResult {
+    success: Boolean!
+    errors: [String]
+}
+
+
