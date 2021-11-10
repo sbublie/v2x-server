@@ -52,6 +52,7 @@ class UdpService():
             pass
 
         if decoded:
+            # implement generic decoding for all intersections
             if str(decoded['spat']['intersections'][0]['id']['id']) == str(309):
                 
                 if self.spat_responses:
@@ -61,8 +62,6 @@ class UdpService():
                     self.spat_responses.append(decoded)
                     print("309 spat added") 
             
-
-        
     def resolve_udp_packets(self):
 
         if sys.argv[1] == 'debug':

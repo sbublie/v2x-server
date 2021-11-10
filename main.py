@@ -15,9 +15,9 @@ def main():
     app = Flask(__name__)
 
     query = ObjectType("Query")
-    query.set_field("intersections_meta", resolve_intersections)
-    query.set_field("intersection_state", resolve_intersection_state)
-    query.set_field("intersection_map", resolve_intersection_map)
+    query.set_field("messages", resolve_messages)
+    query.set_field("intersection", resolve_intersection)
+    
 
     type_defs = load_schema_from_path("schema.graphql")
     schema = make_executable_schema(
@@ -44,13 +44,16 @@ def main():
 
     app.run(host="0.0.0.0", port=5000)
 
-def resolve_intersections(obj, info):
-    intersections = message_service.get_intersections()
+def resolve_messages(obj, info):
+    messages = message_service.get_messages()
     
+    if not messages:
+        messages = 'None'
+
     try:
         payload = {
             "success": True,
-            "intersections": intersections
+            "messages": messages
         }
     except Exception as error:
         payload = {
@@ -61,32 +64,17 @@ def resolve_intersections(obj, info):
     return payload
 
 @convert_kwargs_to_snake_case
-def resolve_intersection_state(obj, info, intersection_id): 
+def resolve_intersection(obj, info, intersection_id): 
     
-    states = message_service.get_states(intersection_id)
+    intersection = message_service.get_intersection(intersection_id)
     
-    if not states:
-        states = 'None'
+    if not intersection:
+        intersection = 'None'
     
     try:
         payload = {
             "success": True,
-            "states": states
-        }
-    except Exception as error:
-        payload = {
-            "success": False,
-            "errors": [str(error)]
-        }
-    return payload
-
-@convert_kwargs_to_snake_case
-def resolve_intersection_map(obj, info, intersection_id): 
-    map = message_service.get_map(intersection_id)
-    try:
-        payload = {
-            "success": True,
-            "map": map
+            "item": intersection
         }
     except Exception as error:
         payload = {

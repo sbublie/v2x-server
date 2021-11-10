@@ -1,23 +1,34 @@
-class IntersectionMeta():
-    def __init__(self, id, region=None, revision=None, status=None, moy=None, timestamp=None, speed_limits=None):
+class Intersection():
+    def __init__(self, id, station_id=None, name=None, region=None, revision=None, status=None, moy=None, timestamp=None, lane_width=None, speed_limits=None, lanes=None, signal_groups=None):
         self.id = id
+        self.station_id = station_id
+        self.name = name
         self.region = region
         self.revision = revision
         self.status = status
         self.moy = moy
         self.timestamp = timestamp
+        self.lane_width = lane_width
         self.speed_limits = speed_limits
+        self.lanes = lanes
+        self.signal_groups = signal_groups
 
-class IntersectionState():
-    def __init__(self, signal_group, event_state=None, min_end_time=None, max_end_time=None, likely_time=None, confidence=None) -> None:
-        self.signal_group = signal_group
-        self.event_state = event_state
+class Message():
+    def __init__(self, intersection_id, map_available, spat_available):
+        self.intersection_id = intersection_id
+        self.map_available = map_available
+        self.spat_available =  spat_available
+
+class SignalGroup():
+    def __init__(self, id, state=None, min_end_time=None, max_end_time=None, likely_time=None, confidence=None) -> None:
+        self.id = id
+        self.state = state
         self.min_end_time = min_end_time
         self.max_end_time = max_end_time
         self.likely_time = likely_time
         self.confidence = confidence
 
-class Map():
+class IntersectionLanes():
     def __init__(self, position, vehicle_lanes, bike_lanes, crosswalks) -> None:
         self.position = position
         self.vehicle_lanes = vehicle_lanes
@@ -40,7 +51,7 @@ class LaneAttributes():
         self.maneuvers = maneuvers
 
 class Node():
-    def __init__(self, offset, d_width) -> None:
+    def __init__(self, offset, d_width=None) -> None:
         self.offset = offset
         self.d_width = d_width
 
