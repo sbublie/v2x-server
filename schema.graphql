@@ -84,7 +84,7 @@ type Lane {
 type LaneAttributes {
     ingress_approach: Int
     egress_approach: Int
-    directional_use: String
+    approach_type: Int
     shared_with: Int
     maneuvers: Int
 }
