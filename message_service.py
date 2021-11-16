@@ -77,12 +77,30 @@ class MessageService():
             for node in lane['nodeList'][1]:
                 nodes.append(models.Node(models.Offset(node['delta'][1]['x'], node['delta'][1]['y'])))
             
+            ingress_approach, egress_approach, approach_type, shared_with, maneuvers = None, None, 0, None, None
+
+            if 'ingressApproach' in lane:
+                ingress_approach = lane['ingressApproach']
+            if 'egressApproach' in lane:
+                egress_approach = lane['egressApproach']
+            if 'directionalUse' in lane['laneAttributes']:
+                if lane['laneAttributes']['directionalUse'][0] == b'\x80':
+                    approach_type = 1
+            #if 'sharedWith' in lane['laneAttributes']:
+                #shared_with = lane['laneAttributes']['sharedWith']
+            #if 'maneuvers' in lane['laneAttributes']:
+                #maneuvers = lane['laneAttributes']['maneuvers']
+                
+            attributes = models.LaneAttributes(ingress_approach=ingress_approach, egress_approach=egress_approach, approach_type=approach_type, shared_with=shared_with, maneuvers=maneuvers)
+                
+            print(lane['laneAttributes']['directionalUse'][0])
+
             if 'bikeLane' in lane['laneAttributes']['laneType']:
-                bike_lanes.append(models.Lane(id=lane['laneID'], nodes=nodes))
+                bike_lanes.append(models.Lane(id=lane['laneID'], nodes=nodes, attributes=attributes))
             if 'vehicle' in lane['laneAttributes']['laneType']:
-                vehicle_lanes.append(models.Lane(id=lane['laneID'], nodes=nodes))
+                vehicle_lanes.append(models.Lane(id=lane['laneID'], nodes=nodes, attributes=attributes))
             if 'crosswalk' in lane['laneAttributes']['laneType']:
-                crosswalks.append(models.Lane(id=lane['laneID'], nodes=nodes))
+                crosswalks.append(models.Lane(id=lane['laneID'], nodes=nodes, attributes=attributes))
 
         return models.IntersectionLanes(
             position=models.Position(

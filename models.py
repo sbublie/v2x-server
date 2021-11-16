@@ -43,10 +43,10 @@ class Lane():
         self.connects_to = connects_to
 
 class LaneAttributes():
-    def __init__(self, ingress_approach, egress_approach, directional_use, shared_with, maneuvers) -> None:
+    def __init__(self, ingress_approach, egress_approach, approach_type, shared_with, maneuvers) -> None:
         self.ingress_approach = ingress_approach
         self.egress_approach = egress_approach
-        self.directional_use = directional_use
+        self.approach_type = approach_type
         self.shared_with = shared_with
         self.maneuvers = maneuvers
 
