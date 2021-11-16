@@ -92,8 +92,6 @@ class MessageService():
                 #maneuvers = lane['laneAttributes']['maneuvers']
                 
             attributes = models.LaneAttributes(ingress_approach=ingress_approach, egress_approach=egress_approach, approach_type=approach_type, shared_with=shared_with, maneuvers=maneuvers)
-                
-            print(lane['laneAttributes']['directionalUse'][0])
 
             if 'bikeLane' in lane['laneAttributes']['laneType']:
                 bike_lanes.append(models.Lane(id=lane['laneID'], nodes=nodes, attributes=attributes))
