@@ -1,49 +1,62 @@
+# V2X_Server GraphQL Schema
+# Version 0.0.1
+
 schema {
     query: Query
 }
 
+type Query {
+    messages: MessagesResult!
+    intersection(intersectionId: ID!): IntersectionResult!
+}
+
+type MessagesResult {
+    success: Boolean!
+    errors: [String]
+    messages: [Message]
+}
+
+type IntersectionResult {
+    success: Boolean!
+    errors: [String]
+    item: Intersection
+}
+
 type Intersection {
-    id: ID
+    id: ID!
+    station_id: ID
+    name: String
     region: Int
     revision: Int
     status: Int
     moy: Int
     timestamp: Int
+    lane_width: Int
     speed_limits: [SpeedLimit]
+    lanes: IntersectionLanes
+    signal_groups: [SignalGroup]
 }
 
-type IntersectionMap {
+type IntersectionLanes {
     position: Position
     vehicle_lanes: [Lane]
     bike_lanes: [Lane]
     crosswalks: [Lane]
 }
 
-type IntersectionState {
-    signal_group: ID!
-    event_state: String
-    min_end_time: Int
-    max_end_time: Int
-    likely_time: Int
+type SignalGroup {
+    id: ID!
+    state: String
+    min_end_time: String
+    max_end_time: String
+    likely_time: String
     confidence: Int
 }
 
-type IntersectionMetaResult {
-    success: Boolean!
-    errors: [String]
-    intersections: [Intersection]
-}
-
-type IntersectionStateResult {
-    success: Boolean!
-    errors: [String]
-    states: [IntersectionState]
-}
-
-type IntersectionMapResult {
-    success: Boolean!
-    errors: [String]
-    map: IntersectionMap
+type Message {
+    intersection_id: ID
+    map_available: Boolean
+    spat_available: Boolean
 }
 
 type Offset {
@@ -71,7 +84,7 @@ type Lane {
 type LaneAttributes {
     ingress_approach: Int
     egress_approach: Int
-    directional_use: String
+    approach_type: Int
     shared_with: Int
     maneuvers: Int
 }
@@ -86,16 +99,3 @@ type ConnectsTo {
     maneuver: Int
     signal_group: Int
 }
-
-type Query {
-    intersections_meta: IntersectionMetaResult!
-    intersection_state(intersectionId: ID!): IntersectionStateResult!
-    intersection_map(intersectionId: ID!): IntersectionMapResult!
-}
-
-type DeleteTodoResult {
-    success: Boolean!
-    errors: [String]
-}
-
-
