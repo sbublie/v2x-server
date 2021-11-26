@@ -48,7 +48,10 @@ class MessageService():
                 ]
         else:
             speed_limits = None
-        new_intersection = models.Intersection(
+        
+        ref_position = models.Position(map['map']['intersections'][0]['refPoint']['lat'], map['map']['intersections'][0]['refPoint']['long'])
+        
+        return models.Intersection(
             id=map['map']['intersections'][0]['id']['id'], 
             station_id = map['header']['stationID'],
             name = map['map']['intersections'][0]['name'],
@@ -59,16 +62,16 @@ class MessageService():
             timestamp = None,
             lane_width = None,
             speed_limits = speed_limits,
+            ref_position = ref_position,
             lanes = self.get_lanes(intersection_id),
             signal_groups = self.get_signal_groups(intersection_id)
         )
 
-        return new_intersection
     
     def get_lanes(self, intersection_id):
         single_map = self.get_single_map(intersection_id)
         
-        vehicle_lanes, bike_lanes, crosswalks = [], [], []
+        lanes = []
 
         for lane in single_map['map']['intersections'][0]['laneSet']:
     
@@ -77,38 +80,44 @@ class MessageService():
             for node in lane['nodeList'][1]:
                 nodes.append(models.Node(models.Offset(node['delta'][1]['x'], node['delta'][1]['y'])))
             
-            ingress_approach, egress_approach, approach_type, shared_with, maneuvers = None, None, 0, None, None
+            ingress_approach_id, egress_approach_id, approach_type, shared_with_id, maneuver_id = None, None, 0, None, None
 
             if 'ingressApproach' in lane:
-                ingress_approach = lane['ingressApproach']
+                ingress_approach_id = lane['ingressApproach']
             if 'egressApproach' in lane:
-                egress_approach = lane['egressApproach']
+                egress_approach_id = lane['egressApproach']
             if 'directionalUse' in lane['laneAttributes']:
                 if lane['laneAttributes']['directionalUse'][0] == b'\x80':
                     approach_type = 1
             #if 'sharedWith' in lane['laneAttributes']:
-                #shared_with = lane['laneAttributes']['sharedWith']
+                #shared_with_id = lane['laneAttributes']['sharedWith']
             #if 'maneuvers' in lane['laneAttributes']:
-                #maneuvers = lane['laneAttributes']['maneuvers']
+                #maneuver_id = lane['laneAttributes']['maneuvers']
                 
-            attributes = models.LaneAttributes(ingress_approach=ingress_approach, egress_approach=egress_approach, approach_type=approach_type, shared_with=shared_with, maneuvers=maneuvers)
+            connects_to = None
+            if 'connectsTo' in lane and 'signalGroup' in lane['connectsTo'][0]:
+                connects_to = models.ConnectsTo(signal_group_id=lane['connectsTo'][0]['signalGroup'])
 
-            if 'bikeLane' in lane['laneAttributes']['laneType']:
-                bike_lanes.append(models.Lane(id=lane['laneID'], nodes=nodes, attributes=attributes))
+            lane_type = None
             if 'vehicle' in lane['laneAttributes']['laneType']:
-                vehicle_lanes.append(models.Lane(id=lane['laneID'], nodes=nodes, attributes=attributes))
+                lane_type = 0
+            if 'bikeLane' in lane['laneAttributes']['laneType']:
+                lane_type = 1
             if 'crosswalk' in lane['laneAttributes']['laneType']:
-                crosswalks.append(models.Lane(id=lane['laneID'], nodes=nodes, attributes=attributes))
+                lane_type = 2 
 
-        return models.IntersectionLanes(
-            position=models.Position(
-                single_map['map']['intersections'][0]['refPoint']['lat'],
-                single_map['map']['intersections'][0]['refPoint']['long']),
-            bike_lanes = bike_lanes,
-            vehicle_lanes = vehicle_lanes,
-            crosswalks = crosswalks
-        )
-
+            lanes.append(models.Lane(
+                id=lane['laneID'],
+                type=lane_type,
+                nodes=nodes,
+                connects_to=connects_to,
+                ingress_approach_id=ingress_approach_id,
+                egress_approach_id=egress_approach_id,
+                approach_type=approach_type,
+                shared_with_id=shared_with_id,
+                maneuver_id=maneuver_id
+            ))
+        return lanes
 
     def get_signal_groups(self, intersection_id):
         spat = self.get_single_spat(intersection_id)
@@ -131,9 +140,20 @@ class MessageService():
                 if 'confidence' in signal_group['state-time-speed'][0]['timing']:
                     confidence = signal_group['state-time-speed'][0]['timing']['confidence']
 
+                state = 0
+                if signal_group['state-time-speed'][0]['eventState'] == 'permissive-Movement-Allowed':
+                    state = 1
+                # TODO: Find string for yellow
+                if signal_group['state-time-speed'][0]['eventState'] == 'yellow':
+                    state = 2
+                if signal_group['state-time-speed'][0]['eventState'] == 'stop-And-Remain':
+                    state = 3
+                if signal_group['state-time-speed'][0]['eventState'] == 'dark':
+                    state = 4
+
                 new_state = models.SignalGroup(
                     id = signal_group['signalGroup'],
-                    state = signal_group['state-time-speed'][0]['eventState'],
+                    state = state,
                     min_end_time = min_end_time,            
                     max_end_time = max_end_time,
                     likely_time = likely_time,
@@ -160,4 +180,5 @@ class MessageService():
         result = time.localtime(time.time())
         t = (result.tm_year, result.tm_mon, result.tm_mday, result.tm_hour, 0, 0, 0, 0, 0)
         lt = time.mktime(t)
-        return time.ctime(lt+(int(given_seconds)/10))
+        #return time.ctime(lt+(int(given_seconds)/10))
+        return 123456

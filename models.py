@@ -1,5 +1,5 @@
 class Intersection():
-    def __init__(self, id, station_id=None, name=None, region=None, revision=None, status=None, moy=None, timestamp=None, lane_width=None, speed_limits=None, lanes=None, signal_groups=None):
+    def __init__(self, id, station_id=None, name=None, region=None, revision=None, status=None, moy=None, timestamp=None, lane_width=None, speed_limits=None, ref_position=None, lanes=None, signal_groups=None):
         self.id = id
         self.station_id = station_id
         self.name = name
@@ -10,6 +10,7 @@ class Intersection():
         self.timestamp = timestamp
         self.lane_width = lane_width
         self.speed_limits = speed_limits
+        self.ref_position = ref_position
         self.lanes = lanes
         self.signal_groups = signal_groups
 
@@ -28,27 +29,17 @@ class SignalGroup():
         self.likely_time = likely_time
         self.confidence = confidence
 
-class IntersectionLanes():
-    def __init__(self, position, vehicle_lanes, bike_lanes, crosswalks) -> None:
-        self.position = position
-        self.vehicle_lanes = vehicle_lanes
-        self.bike_lanes = bike_lanes
-        self.crosswalks = crosswalks
-
 class Lane():
-    def __init__(self, id, attributes=None, nodes=None, connects_to=None) -> None:
+    def __init__(self, id, type, nodes=None, connects_to=None, ingress_approach_id=None, egress_approach_id=None, approach_type=None, shared_with_id=None, maneuver_id=None) -> None:
         self.id = id
-        self.attributes = attributes
+        self.type = type
         self.nodes = nodes
         self.connects_to = connects_to
-
-class LaneAttributes():
-    def __init__(self, ingress_approach, egress_approach, approach_type, shared_with, maneuvers) -> None:
-        self.ingress_approach = ingress_approach
-        self.egress_approach = egress_approach
+        self.ingress_approach_id = ingress_approach_id
+        self.egress_approach_id = egress_approach_id
         self.approach_type = approach_type
-        self.shared_with = shared_with
-        self.maneuvers = maneuvers
+        self.shared_with_id = shared_with_id
+        self.maneuver_id = maneuver_id
 
 class Node():
     def __init__(self, offset, d_width=None) -> None:
@@ -61,10 +52,10 @@ class Offset():
         self.y = y
 
 class ConnectsTo():
-    def __init__(self, lane_id, maneuver, signal_group_id) -> None:
+    def __init__(self, lane_id = None, maneuver = None, signal_group_id = None) -> None:
         self.lane = lane_id
         self.maneuver = maneuver
-        self.signal_group = signal_group_id
+        self.signal_group_id = signal_group_id
 
 class Position():
     def __init__(self, lat, long) -> None:
