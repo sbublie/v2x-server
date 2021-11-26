@@ -1,5 +1,5 @@
-# V2X_Server GraphQL Schema
-# Version 0.0.1
+# V2X_Project GraphQL Schema
+# Version 0.0.2
 
 schema {
     query: Query
@@ -23,8 +23,8 @@ type IntersectionResult {
 }
 
 type Intersection {
-    id: ID!
-    station_id: ID
+    id: Int!
+    station_id: Int
     name: String
     region: Int
     revision: Int
@@ -33,35 +33,53 @@ type Intersection {
     timestamp: Int
     lane_width: Int
     speed_limits: [SpeedLimit]
-    lanes: IntersectionLanes
+    ref_position: Position
+    lanes: [Lane]
     signal_groups: [SignalGroup]
 }
 
-type IntersectionLanes {
-    position: Position
-    vehicle_lanes: [Lane]
-    bike_lanes: [Lane]
-    crosswalks: [Lane]
+
+type Message {
+    intersection_id: Int!
+    map_available: Boolean!
+    spat_available: Boolean!
 }
 
 type SignalGroup {
-    id: ID!
-    state: String
-    min_end_time: String
-    max_end_time: String
-    likely_time: String
+    id: Int!
+    state: Int
+    min_end_time: Int
+    max_end_time: Int
+    likely_time: Int
     confidence: Int
 }
 
-type Message {
-    intersection_id: ID
-    map_available: Boolean
-    spat_available: Boolean
+type Lane {
+    id: Int!
+    type: Int!
+    nodes: [Node]
+    connects_to: ConnectsTo    
+    ingress_approach_id: Int
+    egress_approach_id: Int
+    approach_type: Int
+    shared_with_id: Int
+    maneuver_id: Int
+}
+
+type Node {
+    offset: Offset
+    d_width: Int
 }
 
 type Offset {
     x: Int!
     y: Int!
+}
+
+type ConnectsTo {
+    lane_id: Int
+    maneuver_id: Int
+    signal_group_id: Int
 }
 
 type Position {
@@ -70,32 +88,6 @@ type Position {
 }
 
 type SpeedLimit {
-    type: String!
+    type: Int!
     speed: Int!
-}
-
-type Lane {
-    id: ID!
-    attributes: LaneAttributes
-    nodes: [Node]
-    connects_to: ConnectsTo
-}
-
-type LaneAttributes {
-    ingress_approach: Int
-    egress_approach: Int
-    approach_type: Int
-    shared_with: Int
-    maneuvers: Int
-}
-
-type Node {
-    offset: Offset
-    d_width: Int
-}
-
-type ConnectsTo {
-    lane: ID!
-    maneuver: Int
-    signal_group: Int
 }
