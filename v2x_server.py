@@ -6,18 +6,18 @@ from ariadne import load_schema_from_path, make_executable_schema, \
 from ariadne.constants import PLAYGROUND_HTML
 
 from message_service import MessageService
-from udp_service import UdpService 
+from udp_service import UdpService
 
 import models
 
+
 def main():
-    
+
     app = Flask(__name__)
 
     query = ObjectType("Query")
     query.set_field("messages", resolve_messages)
     query.set_field("intersection", resolve_intersection)
-    
 
     type_defs = load_schema_from_path("schema.graphql")
     schema = make_executable_schema(
@@ -44,9 +44,10 @@ def main():
 
     app.run(host="0.0.0.0", port=5000)
 
+
 def resolve_messages(obj, info):
     messages = message_service.get_messages()
-    
+
     if not messages:
         messages = 'None'
 
@@ -60,17 +61,18 @@ def resolve_messages(obj, info):
             "success": False,
             "errors": [str(error)]
         }
-    
+
     return payload
 
+
 @convert_kwargs_to_snake_case
-def resolve_intersection(obj, info, intersection_id): 
-    
+def resolve_intersection(obj, info, intersection_id):
+
     intersection = message_service.get_intersection(intersection_id)
-    
+
     if not intersection:
         intersection = 'None'
-    
+
     try:
         payload = {
             "success": True,
@@ -83,10 +85,10 @@ def resolve_intersection(obj, info, intersection_id):
         }
     return payload
 
+
 if __name__ == '__main__':
     udp_service = UdpService()
     message_service = MessageService(udp_service)
     x = threading.Thread(target=udp_service.resolve_udp_packets, daemon=True)
     x.start()
     main()
-    
