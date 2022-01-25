@@ -6,10 +6,28 @@ Please note that the project is in a very early stage. This means essential part
 
 ## Getting started
 
+To avoid compatibility issues please create a new virtual environment for this project.
+
 1. Clone this repository and open the terminal in the main folder.
 2. Install the required packages with `pip install -r requirements.txt`.
-3. Start the server with `python3 -m v2x_server`. In case you want to start the server in offline mode with sample data use `python3 -m v2x_server debug`.
-4. The GraphQL playground is now available at `http://localhost:5000/graphql. API requests can be sent to this endpoint (POST request).  
+3. Start the server with `python -m v2x_server`. In case you want to start the server in offline mode with sample data use `python -m v2x_server debug`. 
+4. The GraphQL playground is now available at <http://localhost:5000/graphql>. API requests can be sent to this endpoint (POST request).  
+
+Example GraphQL query for requesting available messages and signal groups:
+
+```graphql
+query  {
+  messages {
+    messages {intersection_id, spat_available, map_available}
+  }
+  intersection(intersectionId: 309) {
+    item {
+      name, signal_groups {id}
+    }
+  }
+}
+```
+GraphQL docs are available in the playground
 
 ## Features
 
@@ -19,7 +37,6 @@ Please note that the project is in a very early stage. This means essential part
 
 ## Missing Features
 
-- All available data processed
+- Processing of all available data
 - Realtime processing
-
-
+- Performance 
