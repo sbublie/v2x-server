@@ -104,11 +104,11 @@ class MessageService():
 
             lane_type = None
             if 'vehicle' in lane['laneAttributes']['laneType']:
-                lane_type = 0
+                lane_type = "VEHICLELANE"
             if 'bikeLane' in lane['laneAttributes']['laneType']:
-                lane_type = 1
+                lane_type = "BIKELANE"
             if 'crosswalk' in lane['laneAttributes']['laneType']:
-                lane_type = 2
+                lane_type = "CROSSWALK"
 
             lanes.append(models.Lane(
                 id=lane['laneID'],
@@ -147,16 +147,18 @@ class MessageService():
                 if 'confidence' in signal_group['state-time-speed'][0]['timing']:
                     confidence = signal_group['state-time-speed'][0]['timing']['confidence']
 
-                state = 0
-                if signal_group['state-time-speed'][0]['eventState'] == 'permissive-Movement-Allowed':
-                    state = 1
+                state = 'UNDEFINED'
+                if 'eventState' in signal_group['state-time-speed'][0]:
+                    match signal_group['state-time-speed'][0]['eventState']:
+                        case 'permissive-Movement-Allowed':
+                            state = "GREEN"
                 # TODO: Find string for yellow
-                if signal_group['state-time-speed'][0]['eventState'] == 'yellow':
-                    state = 2
-                if signal_group['state-time-speed'][0]['eventState'] == 'stop-And-Remain':
-                    state = 3
-                if signal_group['state-time-speed'][0]['eventState'] == 'dark':
-                    state = 4
+                        case 'yellow':
+                            state = 'YELLOW'
+                        case 'stop-And-Remain':
+                            state = 'RED'
+                        case 'dark':
+                            state = 'DARK'
 
                 new_state = models.SignalGroup(
                     id=signal_group['signalGroup'],
