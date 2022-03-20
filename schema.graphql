@@ -1,5 +1,5 @@
 # V2X_Project GraphQL Schema
-# Version 0.0.2
+# Version 0.0.3
 
 schema {
     query: Query
@@ -14,6 +14,12 @@ type MessagesResult {
     success: Boolean!
     errors: [String]
     messages: [Message]
+}
+
+type Message {
+    intersection_id: Int!
+    map_available: Boolean!
+    spat_available: Boolean!
 }
 
 type IntersectionResult {
@@ -38,26 +44,27 @@ type Intersection {
     signal_groups: [SignalGroup]
 }
 
-
-type Message {
-    intersection_id: Int!
-    map_available: Boolean!
-    spat_available: Boolean!
-}
-
 type SignalGroup {
     id: Int!
-    state: Int
+    state: SignalGroupState!
     min_end_time: Int
     max_end_time: Int
     likely_time: Int
     confidence: Int
 }
 
+enum SignalGroupState {
+    UNDEFINED
+    GREEN
+    YELLOW
+    RED
+    DARK
+}
+
 type Lane {
     id: Int!
-    type: Int!
-    nodes: [Node]
+    type: LaneType!
+    nodes: [Node]!
     connects_to: ConnectsTo    
     ingress_approach_id: Int
     egress_approach_id: Int
@@ -66,8 +73,14 @@ type Lane {
     maneuver_id: Int
 }
 
+enum LaneType {
+    VEHICLELANE
+    BIKELANE
+    CROSSWALK
+}
+
 type Node {
-    offset: Offset
+    offset: Offset!
     d_width: Int
 }
 
