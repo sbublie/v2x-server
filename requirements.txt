@@ -1,5 +1,6 @@
 #API Server
 flask
+flask-cors
 
 # GraphQL API 
 ariadne

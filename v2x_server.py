@@ -1,5 +1,6 @@
 import threading
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 from ariadne import load_schema_from_path, make_executable_schema, \
     graphql_sync, snake_case_fallback_resolvers, ObjectType, convert_kwargs_to_snake_case
@@ -8,12 +9,11 @@ from ariadne.constants import PLAYGROUND_HTML
 from message_service import MessageService
 from udp_service import UdpService
 
-import models
-
 
 def main():
 
     app = Flask(__name__)
+    CORS(app)
 
     query = ObjectType("Query")
     query.set_field("messages", resolve_messages)
