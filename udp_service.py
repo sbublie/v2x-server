@@ -67,7 +67,12 @@ class UdpService():
 
     def resolve_udp_packets(self):
 
-        if sys.argv[1] == 'debug':
+        try:
+            mode = sys.argv[1]
+        except IndexError:
+            mode = "live"
+        
+        if mode == 'debug':
 
             datalist = []
 
@@ -85,7 +90,7 @@ class UdpService():
                     with threading.Lock():
                         self.handle_spatem(data)
 
-        else:
+        if mode == 'live':
             while True:
                 time.sleep(.1)
                 data, addr = self.s.recvfrom(4096)
