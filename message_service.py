@@ -186,9 +186,8 @@ class MessageService():
 
     def convertTime(self, given_seconds):
 
-        result = time.localtime(time.time())
-        t = (result.tm_year, result.tm_mon,
-             result.tm_mday, result.tm_hour, 0, 0, 0, 0, 0)
+        currentTime = time.localtime(time.time())
+        t = (currentTime.tm_year, currentTime.tm_mon,
+             currentTime.tm_mday, currentTime.tm_hour, 0, 0, 0, 0, 0)
         lt = time.mktime(t)
-        # return time.ctime(lt+(int(given_seconds)/10))
-        return 123456
+        return int(lt+(given_seconds/10))
