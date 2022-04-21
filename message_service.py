@@ -40,35 +40,41 @@ class MessageService():
 
     def get_intersection(self, intersection_id):
 
+        
         map = self.get_single_map(intersection_id)
-        spat = self.get_single_spat(intersection_id)
+        
+        if map:
+            if "speedLimits" in map['map']['intersections'][0]:
+                speed_limits = [models.SpeedLimit(
+                    speed=map['map']['intersections'][0]['speedLimits'][0]['speed'],
+                    type=map['map']['intersections'][0]['speedLimits'][0]['type'])
+                ]
+            else:
+                speed_limits = None
+            
+            if 'refPoint' in map['map']['intersections'][0]:
+                ref_position = models.Position(
+                    map['map']['intersections'][0]['refPoint']['lat'], map['map']['intersections'][0]['refPoint']['long'])
+            else:
+                ref_position = models.Position(49, 9)
 
-        if "speedLimits" in map['map']['intersections'][0]:
-            speed_limits = [models.SpeedLimit(
-                speed=map['map']['intersections'][0]['speedLimits'][0]['speed'],
-                type=map['map']['intersections'][0]['speedLimits'][0]['type'])
-            ]
+            return models.Intersection(
+                id=map['map']['intersections'][0]['id']['id'],
+                station_id=map['header']['stationID'],
+                name=map['map']['intersections'][0]['name'],
+                region=map['map']['intersections'][0]['id']['region'],
+                revision=map['map']['intersections'][0]['revision'],
+                status=None,
+                moy=None,
+                timestamp=None,
+                lane_width=None,
+                speed_limits=speed_limits,
+                ref_position=ref_position,
+                lanes=self.get_lanes(intersection_id),
+                signal_groups=self.get_signal_groups(intersection_id)
+            )
         else:
-            speed_limits = None
-
-        ref_position = models.Position(
-            map['map']['intersections'][0]['refPoint']['lat'], map['map']['intersections'][0]['refPoint']['long'])
-
-        return models.Intersection(
-            id=map['map']['intersections'][0]['id']['id'],
-            station_id=map['header']['stationID'],
-            name=map['map']['intersections'][0]['name'],
-            region=map['map']['intersections'][0]['id']['region'],
-            revision=map['map']['intersections'][0]['revision'],
-            status=None,
-            moy=None,
-            timestamp=None,
-            lane_width=None,
-            speed_limits=speed_limits,
-            ref_position=ref_position,
-            lanes=self.get_lanes(intersection_id),
-            signal_groups=self.get_signal_groups(intersection_id)
-        )
+            return models.Intersection(id=309)
 
     def get_lanes(self, intersection_id):
         single_map = self.get_single_map(intersection_id)

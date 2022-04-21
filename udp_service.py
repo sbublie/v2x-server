@@ -33,16 +33,16 @@ class UdpService():
             pass
 
         if decoded:
-            if not self.map_responses:
+            if self.map_responses is None:
                 self.map_responses.append(decoded)
                 print("map added")
             else:
                 for map in self.map_responses:
-                    if decoded['header']['stationID'] != map['header']['stationID']:
+                    if decoded['header']['stationID'] == map['header']['stationID']:
+                        print("map not added")
+                        return
                         self.map_responses.append(decoded)
                         print("map added")
-                    else:
-                        print("map not added")
 
     def _handle_spatem(self, data):
         print('decode spat')
@@ -86,6 +86,7 @@ class UdpService():
             for data in datalist:
                 # TODO: Use ItsPduHeader to identify message type
                 if const.MAPEM_IDENTIFIER in data:
+                    with threading.Lock():
                     self._handle_mapem(data)
                 if const.SPATEM_IDENTIFIER in data:
                     with threading.Lock():
