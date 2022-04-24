@@ -158,12 +158,23 @@ class MessageService():
                     match signal_group['state-time-speed'][0]['eventState']:
                         case 'permissive-Movement-Allowed':
                             state = "GREEN"
-                # TODO: Find string for yellow
-                        case 'yellow':
+                        case 'pre-Movement':
+                            state = "GREEN"
+                        case 'protected-Movement-Allowed':
+                            state = "GREEN"
+                        case 'permissive-Clearance':
+                            state = 'YELLOW'
+                        case 'protected-Clearance':
+                            state = 'YELLOW'
+                        case 'caution-Conflicting-Traffic':
                             state = 'YELLOW'
                         case 'stop-And-Remain':
                             state = 'RED'
+                        case 'stop-Then-Proceed':
+                            state = 'RED'
                         case 'dark':
+                            state = 'DARK'
+                        case 'unavailable':
                             state = 'DARK'
 
                 new_state = models.SignalGroup(
