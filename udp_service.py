@@ -94,7 +94,7 @@ class UdpService():
 
         if mode == 'live':
             while True:
-                time.sleep(.1)
+                time.sleep(.05)
                 data, addr = self.s.recvfrom(4096)
 
                 # TODO: Use ItsPduHeader to identify message type
