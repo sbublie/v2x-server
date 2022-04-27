@@ -87,7 +87,7 @@ class UdpService():
                 # TODO: Use ItsPduHeader to identify message type
                 if const.MAPEM_IDENTIFIER in data:
                     with threading.Lock():
-                    self._handle_mapem(data)
+                        self._handle_mapem(data)
                 if const.SPATEM_IDENTIFIER in data:
                     with threading.Lock():
                         self._handle_spatem(data)
