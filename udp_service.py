@@ -33,7 +33,8 @@ class UdpService():
             pass
 
         if decoded:
-            if self.map_responses is None:
+            
+            if not self.map_responses:
                 self.map_responses.append(decoded)
                 print("map added")
             else:
@@ -41,6 +42,7 @@ class UdpService():
                     if decoded['header']['stationID'] == map['header']['stationID']:
                         print("map not added")
                         return
+                    else:
                         self.map_responses.append(decoded)
                         print("map added")
 
