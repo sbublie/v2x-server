@@ -42,7 +42,6 @@ class UdpService():
                     if decoded['header']['stationID'] == map['header']['stationID']:
                         print("map not added")
                         return
-                    else:
                         self.map_responses.append(decoded)
                         print("map added")
 
