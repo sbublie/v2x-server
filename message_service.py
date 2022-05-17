@@ -162,9 +162,9 @@ class MessageService():
                             state = "GREEN"
                         case 'protected-Movement-Allowed':
                             state = "GREEN"
-                        case 'permissive-Clearance':
+                        case 'permissive-clearance':
                             state = 'YELLOW'
-                        case 'protected-Clearance':
+                        case 'protected-clearance':
                             state = 'YELLOW'
                         case 'caution-Conflicting-Traffic':
                             state = 'YELLOW'
