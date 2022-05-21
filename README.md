@@ -44,3 +44,21 @@ pyinstaller --onefile --add-data "rsc/etsi_mapem_spatem.asn;rsc" --add-data "gra
 *Replace all `;` with `:` on Linux*
 
 This creates a file in the `dist` folder. Make sure to provide the asn.1 file in `dist/rsc` and the GraphQL schema in `dist/graphql_api` before starting the app.
+
+![image](https://user-images.githubusercontent.com/103438908/169650332-8917ca34-fa82-45a4-9208-b2a2c83380b4.png)
+
+## User manual: set-up of Onboard unit :
+
+1. Connect antenna to COHDA-device (blue box) & securely place it on the vehicle's roof. There are three connectors in total:  one blue connector with thinner cable for GPS reception and two green ones with thicker cable for establishing Wi-Fi connection. Please do not attempt to switch on COHDA-device without having first connected the antenna since it functions as terminating resistor. Otherwise, there would be an open line end which can cause the signal's total reflection in phase and thus result in doubling of power. This in turn might possibly lead to the destruction of electronics.
+2. Connect Raspberry Pi to COHDA-device through Ethernet cable (here: yellow cable).
+3. Switch on Raspberry Pi by connecting it to power supply (Power Bank) through USB cable.
+4. Switch on COHDA device by connecting it to power supply (12V battery) with the enclosed battery cable (incl. choke filter). Please be careful to apply correct polarity!
+5. Connect PC to the Raspberry Pi's Wi-Fi network (ITSRouter). The password is itsrouter.
+6. Connect PC to Raspberry Pi by establishing ssh-connection (address: IP 192.168.1.1) --> username pi and password Raspberry
+7. The ssh-connection is then used to connect with COHDA device through the Raspberry Pi's window displayed on PC --> address to be done and password user
+8. To initiate data connection call /opt/cohda/test/runtest_monitor.sh 180 192.168.1.1 target, please note that the program is now running (it can be cancelled by Ctrl + C).
+9. Open a second ssh-window directed to Raspberry Pi (see step 5).
+10. Run command `cd v2x-server`
+11. Run command `python -m v2x_server`
+12. Connect designated client (e.g. Android tablet) with the Raspberry Pi's Wi-Fi network (ITSRouter).
+13. Start V2X-Pilot app on the Android tablet or in your web browser.
