@@ -139,16 +139,13 @@ class MessageService():
                 min_end_time, max_end_time, likely_time, confidence = None, None, None, None
 
                 if 'minEndTime' in signal_group['state-time-speed'][0]['timing']:
-                    min_end_time = self.convertTime(
-                        signal_group['state-time-speed'][0]['timing']['minEndTime'])
+                    min_end_time = signal_group['state-time-speed'][0]['timing']['minEndTime']
 
                 if 'maxEndTime' in signal_group['state-time-speed'][0]['timing']:
-                    max_end_time = self.convertTime(
-                        signal_group['state-time-speed'][0]['timing']['maxEndTime'])
+                    max_end_time = signal_group['state-time-speed'][0]['timing']['maxEndTime']
 
                 if 'likelyTime' in signal_group['state-time-speed'][0]['timing']:
-                    likely_time = self.convertTime(
-                        signal_group['state-time-speed'][0]['timing']['likelyTime'])
+                    likely_time = signal_group['state-time-speed'][0]['timing']['likelyTime']
 
                 if 'confidence' in signal_group['state-time-speed'][0]['timing']:
                     confidence = signal_group['state-time-speed'][0]['timing']['confidence']
@@ -200,11 +197,3 @@ class MessageService():
         for map in map_messages:
             if str(intersection_id) == str(map['map']['intersections'][0]['id']['id']):
                 return map
-
-    def convertTime(self, given_seconds):
-
-        currentTime = time.localtime(time.time())
-        t = (currentTime.tm_year, currentTime.tm_mon,
-             currentTime.tm_mday, currentTime.tm_hour, 0, 0, 0, 0, 0)
-        lt = time.mktime(t)
-        return int(lt+(given_seconds/10))
