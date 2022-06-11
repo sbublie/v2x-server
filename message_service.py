@@ -89,7 +89,7 @@ class MessageService():
                 signal_groups=self.get_signal_groups(intersection_id)
             )
         else:
-            return models.Intersection(id=309)
+            return None
 
     def get_lanes(self, intersection_id):
         single_map = self.get_single_map(intersection_id)
