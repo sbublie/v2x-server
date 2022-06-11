@@ -10,9 +10,6 @@ def initialize(app, message_service):
     def _resolve_messages(obj, info):
         messages = message_service.get_messages()
 
-        if not messages:
-            messages = 'None'
-
         try:
             payload = {
                 "success": True,
@@ -30,9 +27,6 @@ def initialize(app, message_service):
     def _resolve_intersection(obj, info, intersection_id):
 
         intersection = message_service.get_intersection(intersection_id)
-
-        if not intersection:
-            intersection = 'None'
 
         try:
             payload = {
