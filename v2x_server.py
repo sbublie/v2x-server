@@ -1,6 +1,7 @@
 import threading
 from flask import Flask
 from flask_cors import CORS
+import logging
 
 from message_service import MessageService
 from udp_service import UdpService
@@ -19,6 +20,8 @@ def main():
 
 
 if __name__ == '__main__':
+
+    logging.basicConfig(level=logging.DEBUG)
 
     # The UdpService decodes the messages which can then be accessed by the MessageService
     udp_service = UdpService()
