@@ -1,10 +1,10 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask import request, jsonify
 
 from ariadne import load_schema_from_path, make_executable_schema, \
     graphql_sync, snake_case_fallback_resolvers, ObjectType, convert_kwargs_to_snake_case
 from ariadne.constants import PLAYGROUND_HTML
-    
+
+
 def initialize(app, message_service):
 
     def _resolve_messages(obj, info):
@@ -39,9 +39,9 @@ def initialize(app, message_service):
                 "errors": [str(error)]
             }
         return payload
-    
+
     query = ObjectType("Query")
-    query.set_field("messages", _resolve_messages)
+    query.set_field("available_messages", _resolve_messages)
     query.set_field("intersection", _resolve_intersection)
 
     type_defs = load_schema_from_path("graphql_api/schema.graphql")
@@ -66,7 +66,3 @@ def initialize(app, message_service):
 
         status_code = 200 if success else 400
         return jsonify(result), status_code
-        
-    
-
-        

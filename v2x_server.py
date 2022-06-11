@@ -10,12 +10,15 @@ from graphql_api import client
 
 def main():
 
+    # Create a new Flask app
     app = Flask(__name__)
-    # initiate CORS handling to avoid any preflight or cross reference errors
+    # Initialize CORS handling to avoid any preflight or cross reference errors
     CORS(app)
 
+    # Initialize GraphQL client for request handling
     client.initialize(app, message_service)
 
+    # Run the Flask app on localhost with port 5000
     app.run(host="0.0.0.0", port=5000)
 
 
@@ -27,8 +30,9 @@ if __name__ == '__main__':
     udp_service = UdpService()
     message_service = MessageService(udp_service)
 
-    # The idea here is to run the message resolving and the web server on differnt threads
+    # The idea here is to run the MAPEM/SPATEM message decoding and the web server on different threads
     # TODO: Optimize multithreding
-    udp_thread = threading.Thread(target=udp_service.resolve_udp_packets, daemon=False)
+    udp_thread = threading.Thread(
+        target=udp_service.resolve_udp_packets, daemon=False)
     udp_thread.start()
     main()
