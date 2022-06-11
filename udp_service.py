@@ -3,6 +3,7 @@ import socket
 import time
 import asn1tools
 import sys
+import logging
 
 import util.const as const
 
@@ -21,7 +22,7 @@ class UdpService():
         self.spat_responses = []
 
     def _handle_mapem(self, data):
-        print('decode map')
+        logging.debug('decode map')
 
         decoded = False
         try:
@@ -36,19 +37,17 @@ class UdpService():
             
             if not self.map_responses:
                 self.map_responses.append(decoded)
-                print("map added")
+                logging.debug('first map added')
             else:
                 for map in self.map_responses:
                     if decoded['header']['stationID'] == map['header']['stationID']:
-                        print("map not added")
+                        logging.debug('map not added')
                         return
                         self.map_responses.append(decoded)
-                        print("map added")
+                logging.debug('new map added')
 
     def _handle_spatem(self, data):
-        print('decode spat')
-        # TODO: Decode header first?
-
+        logging.debug('decode spat')
         decoded = False
         try:
             # Use asn sequence 'SPATEM' with asn1tools to decode the bytestring after the SPATEM identifier
@@ -63,10 +62,10 @@ class UdpService():
 
                 if self.spat_responses:
                     self.spat_responses[0] = decoded
-                    print("309 spat replaced")
+                    logging.debug('309 spat replaced')
                 else:
                     self.spat_responses.append(decoded)
-                    print("309 spat added")
+                    logging.debug('309 spat added')
 
     def resolve_udp_packets(self):
 
