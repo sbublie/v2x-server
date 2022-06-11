@@ -2,105 +2,105 @@
 # Version 0.1.0
 
 schema {
-    query: Query
+  query: Query
 }
 
 type Query {
   available_messages: MessagesResult!
-    intersection(intersectionId: ID!): IntersectionResult!
+  intersection(intersectionId: ID!): IntersectionResult!
 }
 
 type MessagesResult {
-    success: Boolean!
-    errors: [String]
-    messages: [Message]
+  success: Boolean!
+  errors: [String]
+  messages: [Message]
 }
 
 type Message {
-    intersection_id: Int!
-    map_available: Boolean!
-    spat_available: Boolean!
+  intersection_id: Int!
+  map_available: Boolean!
+  spat_available: Boolean!
 }
 
 type IntersectionResult {
-    success: Boolean!
-    errors: [String]
-    item: Intersection
+  success: Boolean!
+  errors: [String]
+  item: Intersection
 }
 
 type Intersection {
-    id: Int!
-    station_id: Int
-    name: String
-    region: Int
-    revision: Int
-    status: Int
-    moy: Int
-    timestamp: Int
-    lane_width: Int
-    speed_limits: [SpeedLimit]
-    ref_position: Position
-    lanes: [Lane]
-    signal_groups: [SignalGroup]
+  id: Int!
+  station_id: Int
+  name: String
+  region: Int
+  revision: Int
+  status: Int
+  moy: Int
+  timestamp: Int
+  lane_width: Int
+  speed_limits: [SpeedLimit]
+  ref_position: Position
+  lanes: [Lane]
+  signal_groups: [SignalGroup]
 }
 
 type SignalGroup {
-    id: Int!
-    state: SignalGroupState!
-    min_end_time: Int
-    max_end_time: Int
-    likely_time: Int
-    confidence: Int
+  id: Int!
+  state: SignalGroupState!
+  min_end_time: Int
+  max_end_time: Int
+  likely_time: Int
+  confidence: Int
 }
 
 enum SignalGroupState {
-    UNDEFINED
-    GREEN
-    YELLOW
-    RED
-    DARK
+  UNDEFINED
+  GREEN
+  YELLOW
+  RED
+  DARK
 }
 
 type Lane {
-    id: Int!
-    type: LaneType!
-    nodes: [Node]!
-    connects_to: ConnectsTo    
-    ingress_approach_id: Int
-    egress_approach_id: Int
-    approach_type: Int
-    shared_with_id: Int
-    maneuver_id: Int
+  id: Int!
+  type: LaneType!
+  nodes: [Node]!
+  connects_to: ConnectsTo
+  ingress_approach_id: Int
+  egress_approach_id: Int
+  approach_type: Int
+  shared_with_id: Int
+  maneuver_id: Int
 }
 
 enum LaneType {
-    VEHICLELANE
-    BIKELANE
-    CROSSWALK
+  VEHICLELANE
+  BIKELANE
+  CROSSWALK
 }
 
 type Node {
-    offset: Offset!
-    d_width: Int
+  offset: Offset!
+  d_width: Int
 }
 
 type Offset {
-    x: Int!
-    y: Int!
+  x: Int!
+  y: Int!
 }
 
 type ConnectsTo {
-    lane_id: Int
-    maneuver_id: Int
-    signal_group_id: Int
+  lane_id: Int
+  maneuver_id: Int
+  signal_group_id: Int
 }
 
 type Position {
-    lat: Int!
-    long: Int!
+  lat: Int!
+  long: Int!
 }
 
 type SpeedLimit {
-    type: Int!
-    speed: Int!
+  type: Int!
+  speed: Int!
 }

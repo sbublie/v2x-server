@@ -1,10 +1,16 @@
 import models as models
-import time
+from udp_service import UdpService
 
 
 class MessageService():
+    ''' 
+    Class for constructing data models from decoded SPATEM/MAPEM messages.
 
-    def __init__(self, udp_service):
+    The methods are called by the GraphQL client after a request is received.
+    '''
+
+    # Called in main at startup
+    def __init__(self, udp_service: UdpService):
         self.udp_service = udp_service
 
     # Called from the GraphQL client if the MessageResult is requested
@@ -22,42 +28,42 @@ class MessageService():
         # Go through all received MAP messages and add the respective Message models to the local list
         # or modify the existing entry
         if map_messages:
-        for map in map_messages:
-            intersection_id = map['map']['intersections'][0]['id']['id']
-            if messages:
-                for message in messages:
+            for map in map_messages:
+                intersection_id = map['map']['intersections'][0]['id']['id']
+                if messages:
+                    for message in messages:
                         if int(message.intersection_id) == int(intersection_id):
-                        message.map_available = True
-                    else:
-                        messages.append(models.Message(
-                            intersection_id, True, False))
-            else:
+                            message.map_available = True
+                        else:
+                            messages.append(models.Message(
+                                intersection_id, True, False))
+                else:
                     messages.append(models.Message(
                         intersection_id, True, False))
 
         # Go through all received SPAT messages and add the respective Message models to the local list
         # or modify the existing entry
         if spat_messages:
-        for spat in spat_messages:
-            intersection_id = spat['spat']['intersections'][0]['id']['id']
-            if messages:
-                for message in messages:
+            for spat in spat_messages:
+                intersection_id = spat['spat']['intersections'][0]['id']['id']
+                if messages:
+                    for message in messages:
                         if int(message.intersection_id) == int(intersection_id):
-                        message.spat_available = True
-                    else:
-                        messages.append(models.Message(
-                            intersection_id, False, True))
-            else:
+                            message.spat_available = True
+                        else:
+                            messages.append(models.Message(
+                                intersection_id, False, True))
+                else:
                     messages.append(models.Message(
                         intersection_id, False, True))
 
         return messages
 
-    def get_intersection(self, intersection_id):
+    # Called from the GraphQL client if the IntersectionResult is requested
+    def get_intersection(self, intersection_id: int) -> (models.Intersection | None):
 
-        
-        map = self.get_single_map(intersection_id)
-        
+        map = self._get_single_map(intersection_id)
+
         if map:
             if "speedLimits" in map['map']['intersections'][0]:
                 speed_limits = [models.SpeedLimit(
@@ -66,13 +72,14 @@ class MessageService():
                 ]
             else:
                 speed_limits = None
-            
+
             if 'refPoint' in map['map']['intersections'][0]:
                 ref_position = models.Position(
                     map['map']['intersections'][0]['refPoint']['lat'], map['map']['intersections'][0]['refPoint']['long'])
             else:
                 ref_position = models.Position(49, 9)
 
+            # TODO: Implement missing parameter
             return models.Intersection(
                 id=map['map']['intersections'][0]['id']['id'],
                 station_id=map['header']['stationID'],
@@ -85,27 +92,28 @@ class MessageService():
                 lane_width=None,
                 speed_limits=speed_limits,
                 ref_position=ref_position,
-                lanes=self.get_lanes(intersection_id),
-                signal_groups=self.get_signal_groups(intersection_id)
+                lanes=self._get_lanes(intersection_id),
+                signal_groups=self._get_signal_groups(intersection_id)
             )
         else:
             return None
 
-    def get_lanes(self, intersection_id):
-        single_map = self.get_single_map(intersection_id)
+    def _get_lanes(self, intersection_id: int) -> list[models.Lane]:
 
+        single_map = self._get_single_map(intersection_id)
         lanes = []
 
         for lane in single_map['map']['intersections'][0]['laneSet']:
 
             nodes = []
-            # Why 1 here?
+
             for node in lane['nodeList'][1]:
                 nodes.append(models.Node(models.Offset(
                     node['delta'][1]['x'], node['delta'][1]['y'])))
 
             ingress_approach_id, egress_approach_id, approach_type, shared_with_id, maneuver_id = None, None, 0, None, None
 
+            # TODO: Implement missing parameter
             if 'ingressApproach' in lane:
                 ingress_approach_id = lane['ingressApproach']
             if 'egressApproach' in lane:
@@ -144,8 +152,8 @@ class MessageService():
             ))
         return lanes
 
-    def get_signal_groups(self, intersection_id):
-        spat = self.get_single_spat(intersection_id)
+    def _get_signal_groups(self, intersection_id):
+        spat = self._get_single_spat(intersection_id)
         signal_groups = []
 
         if spat:
@@ -189,26 +197,25 @@ class MessageService():
                         case 'unavailable':
                             state = 'DARK'
 
-                new_state = models.SignalGroup(
+                signal_groups.append(models.SignalGroup(
                     id=signal_group['signalGroup'],
                     state=state,
                     min_end_time=min_end_time,
                     max_end_time=max_end_time,
                     likely_time=likely_time,
                     confidence=confidence
-                )
-                signal_groups.append(new_state)
+                ))
 
         return signal_groups
 
-    def get_single_spat(self, intersection_id):
+    def _get_single_spat(self, intersection_id):
         spat_messages = self.udp_service.spat_responses
         for spat in spat_messages:
-            if str(intersection_id) == str(spat['spat']['intersections'][0]['id']['id']):
+            if int(intersection_id) == int(spat['spat']['intersections'][0]['id']['id']):
                 return spat
 
-    def get_single_map(self, intersection_id):
+    def _get_single_map(self, intersection_id):
         map_messages = self.udp_service.map_responses
         for map in map_messages:
-            if str(intersection_id) == str(map['map']['intersections'][0]['id']['id']):
+            if int(intersection_id) == int(map['map']['intersections'][0]['id']['id']):
                 return map
