@@ -1,12 +1,12 @@
-# V2X_Project GraphQL Schema
-# Version 0.0.3
+# V2X-Project GraphQL Schema
+# Version 0.1.0
 
 schema {
     query: Query
 }
 
 type Query {
-    messages: MessagesResult!
+  available_messages: MessagesResult!
     intersection(intersectionId: ID!): IntersectionResult!
 }
 

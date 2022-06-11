@@ -7,34 +7,49 @@ class MessageService():
     def __init__(self, udp_service):
         self.udp_service = udp_service
 
-    def get_messages(self):
+    # Called from the GraphQL client if the MessageResult is requested
+    def get_messages(self) -> list[models.Message]:
+        '''
+        Returns a list of Message to represent the received MAPEM/SPATEM messages. 
+        '''
+        # TODO: Improve the performance of this implementation
+
+        # Get all received SPAT and MAP messages
         spat_messages = self.udp_service.spat_responses
         map_messages = self.udp_service.map_responses
         messages = []
 
+        # Go through all received MAP messages and add the respective Message models to the local list
+        # or modify the existing entry
+        if map_messages:
         for map in map_messages:
             intersection_id = map['map']['intersections'][0]['id']['id']
             if messages:
                 for message in messages:
-                    if str(message.intersection_id) == str(intersection_id):
+                        if int(message.intersection_id) == int(intersection_id):
                         message.map_available = True
                     else:
                         messages.append(models.Message(
                             intersection_id, True, False))
             else:
-                messages.append(models.Message(intersection_id, True, False))
+                    messages.append(models.Message(
+                        intersection_id, True, False))
 
+        # Go through all received SPAT messages and add the respective Message models to the local list
+        # or modify the existing entry
+        if spat_messages:
         for spat in spat_messages:
             intersection_id = spat['spat']['intersections'][0]['id']['id']
             if messages:
                 for message in messages:
-                    if str(message.intersection_id) == str(intersection_id):
+                        if int(message.intersection_id) == int(intersection_id):
                         message.spat_available = True
                     else:
                         messages.append(models.Message(
                             intersection_id, False, True))
             else:
-                messages.append(models.Message(intersection_id, False, True))
+                    messages.append(models.Message(
+                        intersection_id, False, True))
 
         return messages
 
