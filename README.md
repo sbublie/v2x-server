@@ -1,6 +1,8 @@
 # V2X-Server Smart Intersection Server
 
-V2X-Server is a backend application for the [V2X-Pilot](https://github.com/sbublie/v2x-pilot) app. It can decode and expose data received from smart intersections.
+V2X-Server is the backend application for [V2X-Pilot](https://github.com/sbublie/v2x-pilot). It can decode and expose data received from smart intersections.
+
+The app was developed to communicate with the smart intersections in Friedrichshafen. The current implementation is optimized for the [intersection 309](https://www.google.de/maps/@47.6551006,9.4819818,20.96z).
 
 ## Features
 
@@ -44,12 +46,12 @@ query {
 
 ### Required Hardware:
 
-- Cohda Mk.5 with antenna and corresponding power cable
-- 12V power supply for Cohda Device (e.g. 12V battery)
+- Cohda Mk5 OBU with antenna and corresponding power cable
+- 12V power supply for Cohda OBU (e.g. 12V battery)
 - Raspberry Pi, SD card and power supply
 - Ethernet cable
 - PC for setup
-- Client device (Windows or Android device)
+- Client OBU (Windows or Android device)
 
 ### Raspberry Pi Configuration
 
@@ -59,7 +61,7 @@ query {
 - SSH user: pi
 - SSH password: raspberry
 
-### Cohda Device Configuration
+### Cohda OBU Configuration
 
 - IP address: fe80::6e5:48ff:fe20:5b58%eth0
 - SSH user: user
@@ -69,15 +71,15 @@ query {
 
 ### **Hardware Connection**
 
-_Do not power on the Cohda device before connecting the antenna!_
+_Do not power on the Cohda OBU before connecting the antenna!_
 
-**1.** Connect all three antenna cables to the Cohda device.
+**1.** Connect all three antenna cables to the Cohda OBU.
 
-**2.** Connect the Raspberry Pi and the Cohda device using the Ethernet cable.
+**2.** Connect the Raspberry Pi and the Cohda OBU using the Ethernet cable.
 
 **3.** Power on the Raspberry Pi by using the micro USB power supply or a power bank.
 
-**4.** Power on the Cohda device by connecting it to the power supply with the enclosed battery cable. Please check the polarity!
+**4.** Power on the Cohda OBU by connecting it to the power supply with the enclosed battery cable. Please check the polarity!
 
 ### **Raspberry Pi**
 
@@ -109,7 +111,7 @@ To start the server with sample data use:
 python -m v2x_server debug
 ```
 
-### **Cohda Device**
+### **Cohda OBU**
 
 **1.** Establish a ssh connection to the Raspberry Pi from the terminal:
 
@@ -119,7 +121,7 @@ ssh pi@192.168.1.1
 
 Password: `raspberry`
 
-**2.** Connect to the Cohda device using:
+**2.** Connect to the Cohda OBU using:
 
 ```bash
 ssh user@fe80::6e5:48ff:fe20:5b58%eth0

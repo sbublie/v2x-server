@@ -2,14 +2,16 @@ import threading
 from flask import Flask
 from flask_cors import CORS
 import logging
+from waitress import serve
 
 from message_service import MessageService
 from udp_service import UdpService
 from graphql_api import client
+import util.util as util
+import util.const as const
 
 
 def main():
-
     # Create a new Flask app
     app = Flask(__name__)
     # Initialize CORS handling to avoid any preflight or cross reference errors
@@ -18,13 +20,15 @@ def main():
     # Initialize GraphQL client for request handling
     client.initialize(app, message_service)
 
+    util.print_welcome_message()
+
     # Run the Flask app on localhost with port 5000
-    app.run(host="0.0.0.0", port=5000)
+    serve(app, port=const.APP_PORT)
 
 
 if __name__ == '__main__':
 
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
 
     # The UdpService decodes the messages which can then be accessed by the MessageService
     udp_service = UdpService()
