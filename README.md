@@ -93,22 +93,16 @@ ssh pi@192.168.1.1
 
 Password: `raspberry`
 
-**3.** Navigate to the subfolder with
+**3.** Run the V2X-Server with:
 
 ```bash
-cd ./v2x-server
-```
-
-**4.** Run the V2X-Server with:
-
-```bash
-python -m v2x_server
+./v2x_server
 ```
 
 To start the server with sample data use:
 
 ```bash
-python -m v2x_server debug
+./v2x_server debug
 ```
 
 ### **Cohda OBU**

@@ -3,12 +3,12 @@ from flask import Flask
 from flask_cors import CORS
 import logging
 from waitress import serve
+import socket
 
 from message_service import MessageService
 from udp_service import UdpService
 from graphql_api import client
-import util.util as util
-import util.const as const
+import const
 
 
 def main():
@@ -20,7 +20,11 @@ def main():
     # Initialize GraphQL client for request handling
     client.initialize(app, message_service)
 
-    util.print_welcome_message()
+    hostname = socket.gethostname()
+    ip_address = socket.gethostbyname(hostname)
+    print("\n-------------------")
+    print(f"V2X-Server - version {const.APP_VERSION}\nEndpoint for API requests and GraphQL playground: http://{ip_address}:{const.APP_PORT}/graphql")
+    print("-------------------\n\n")
 
     # Run the Flask app on localhost with port 5000
     serve(app, port=const.APP_PORT)
