@@ -18,8 +18,8 @@ class UdpService():
         # Use asn specification to decode uper strings
         self.foo = asn1tools.compile_files("rsc/etsi_mapem_spatem.asn", 'uper')
 
-        self.map_responses = []
-        self.spat_responses = []
+        self.map_messages = {}
+        self.spat_messages = {}
 
     def _handle_mapem(self, data):
         logging.debug('decode map')
@@ -33,17 +33,10 @@ class UdpService():
             pass
 
         if decoded:
+            intersection_id = decoded['map']['intersections'][0]['id']['id']
+            self.map_messages[intersection_id] = decoded
+            logging.debug('new map added')
 
-            if not self.map_responses:
-                self.map_responses.append(decoded)
-                logging.debug('first map added')
-            else:
-                for map in self.map_responses:
-                    if decoded['header']['stationID'] == map['header']['stationID']:
-                        logging.debug('map not added')
-                        return
-                self.map_responses.append(decoded)
-                logging.debug('new map added')
 
     def _handle_spatem(self, data):
         logging.debug('decode spat')
@@ -57,14 +50,8 @@ class UdpService():
 
         if decoded:
             # TODO: implement generic decoding for all intersections
-            if str(decoded['spat']['intersections'][0]['id']['id']) == str(309):
-
-                if self.spat_responses:
-                    self.spat_responses[0] = decoded
-                    logging.debug('309 spat replaced')
-                else:
-                    self.spat_responses.append(decoded)
-                    logging.debug('309 spat added')
+            intersection_id = decoded['spat']['intersections'][0]['id']['id']
+            self.spat_messages[intersection_id] = decoded
 
     def resolve_udp_packets(self):
         try:
@@ -75,7 +62,6 @@ class UdpService():
         if mode == 'debug':
 
             for data in const.EXAMPLE_MAPEM_SPATEM_DATA:
-                # TODO: Use ItsPduHeader to identify message type
                 if const.MAPEM_IDENTIFIER in data:
                     with threading.Lock():
                         self._handle_mapem(data)
@@ -87,8 +73,6 @@ class UdpService():
             while True:
                 time.sleep(.01)
                 data, addr = self.s.recvfrom(4096)
-
-                # TODO: Use ItsPduHeader to identify message type
                 if const.MAPEM_IDENTIFIER in data:
                     with threading.Lock():
                         self._handle_mapem(data)

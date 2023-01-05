@@ -19,49 +19,27 @@ class MessageService():
         '''
         Returns a list of Message to represent the received MAPEM/SPATEM messages. 
         '''
-        # Get all received SPAT and MAP messages
-        spat_messages = self.udp_service.spat_responses
-        map_messages = self.udp_service.map_responses
-        messages = []
+        # Get the intersection ids of all received map and spat messages
+        map_intersection_ids = self.udp_service.map_messages.keys()
+        spat_intersection_ids = self.udp_service.spat_messages.keys()
+        messages = {}
 
-        # Go through all received MAP messages and add the respective Message models to the local list
-        # or modify the existing entry
-        if map_messages:
-            for map in map_messages:
-                intersection_id = map['map']['intersections'][0]['id']['id']
-                if messages:
-                    for message in messages:
-                        if int(message.intersection_id) == int(intersection_id):
-                            message.map_available = True
-                        else:
-                            messages.append(models.Message(
-                                intersection_id, True, False))
-                else:
-                    messages.append(models.Message(
-                        intersection_id, True, False))
+        if spat_intersection_ids:
+            for intersection_id in map_intersection_ids:
+                message = messages.setdefault(intersection_id, models.Message(intersection_id, False, False))
+                message.map_available = True
 
-        # Go through all received SPAT messages and add the respective Message models to the local list
-        # or modify the existing entry
-        if spat_messages:
-            for spat in spat_messages:
-                intersection_id = spat['spat']['intersections'][0]['id']['id']
-                if messages:
-                    for message in messages:
-                        if int(message.intersection_id) == int(intersection_id):
-                            message.spat_available = True
-                        else:
-                            messages.append(models.Message(
-                                intersection_id, False, True))
-                else:
-                    messages.append(models.Message(
-                        intersection_id, False, True))
+        if map_intersection_ids:
+            for intersection_id in spat_intersection_ids:
+                message = messages.setdefault(intersection_id, models.Message(intersection_id, False, False))
+                message.spat_available = True
 
-        return messages
+        return list(messages.values())
 
     # Called from the GraphQL client if the IntersectionResult is requested
     def get_intersection(self, intersection_id: int) -> (models.Intersection | None):
 
-        map = self._get_single_map(intersection_id)
+        map = self.udp_service.map_messages[intersection_id]
         if map:
             # TODO: Implement missing parameter
             return models.Intersection(
@@ -86,7 +64,7 @@ class MessageService():
 
     def _get_lanes(self, intersection_id: int) -> list[models.Lane]:
 
-        single_map = self._get_single_map(intersection_id)
+        single_map = self.udp_service.map_messages[intersection_id]
         lanes = []
         for lane in single_map['map']['intersections'][0]['laneSet']:
             nodes = []
@@ -117,7 +95,7 @@ class MessageService():
     def _get_signal_groups(self, intersection_id):
 
         signal_groups = []
-        spat = self._get_single_spat(intersection_id)
+        spat = self.udp_service.spat_messages[intersection_id]
         if spat:
             for signal_group in spat['spat']['intersections'][0]['states']:
                 signal_groups.append(models.SignalGroup(
@@ -135,14 +113,3 @@ class MessageService():
                 ))
         return signal_groups
 
-    def _get_single_spat(self, intersection_id):
-        spat_messages = self.udp_service.spat_responses
-        for spat in spat_messages:
-            if int(intersection_id) == int(spat.get('spat').get('intersections', [{}])[0].get('id').get('id')):
-                return spat
-
-    def _get_single_map(self, intersection_id):
-        map_messages = self.udp_service.map_responses
-        for map in map_messages:
-            if int(intersection_id) == int(map.get('map').get('intersections', [{}])[0].get('id').get('id')):
-                return map

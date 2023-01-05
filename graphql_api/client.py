@@ -26,7 +26,7 @@ def initialize(app, message_service):
     @convert_kwargs_to_snake_case
     def _resolve_intersection(obj, info, intersection_id):
 
-        intersection = message_service.get_intersection(intersection_id)
+        intersection = message_service.get_intersection(int(intersection_id))
 
         try:
             payload = {
