@@ -5,6 +5,7 @@ import asn1tools
 import sys
 import logging
 
+from args import args
 import const
 
 
@@ -54,12 +55,7 @@ class UdpService():
             self.spat_messages[intersection_id] = decoded
 
     def resolve_udp_packets(self):
-        try:
-            mode = sys.argv[1]
-        except IndexError:
-            mode = "live"
-
-        if mode == 'debug':
+        if args.mode == 'debug':
 
             for data in const.EXAMPLE_MAPEM_SPATEM_DATA:
                 if const.MAPEM_IDENTIFIER in data:
@@ -69,7 +65,7 @@ class UdpService():
                     with threading.Lock():
                         self._handle_spatem(data)
 
-        if mode == 'live':
+        if args.mode == 'live':
             while True:
                 time.sleep(.01)
                 data, addr = self.s.recvfrom(4096)
