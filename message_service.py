@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import models
 import const
 from udp_service import UdpService
@@ -19,21 +21,17 @@ class MessageService():
         '''
         Returns a list of Message to represent the received MAPEM/SPATEM messages. 
         '''
-        # Get the intersection ids of all received map and spat messages
         map_intersection_ids = self.udp_service.map_messages.keys()
         spat_intersection_ids = self.udp_service.spat_messages.keys()
-        messages = {}
+        # Create a set with all intersection ids to avoid the use two for-loops
+        intersection_ids = set(map_intersection_ids).union(set(spat_intersection_ids))
+        # Create a dict that uses a Message object as a default value for a nonexistent key
+        messages = defaultdict(lambda: models.Message(intersection_id, False, False))
+        for intersection_id in intersection_ids:
+            messages[intersection_id].map_available = intersection_id in map_intersection_ids
+            messages[intersection_id].spat_available = intersection_id in spat_intersection_ids
 
-        if spat_intersection_ids:
-            for intersection_id in map_intersection_ids:
-                message = messages.setdefault(intersection_id, models.Message(intersection_id, False, False))
-                message.map_available = True
-
-        if map_intersection_ids:
-            for intersection_id in spat_intersection_ids:
-                message = messages.setdefault(intersection_id, models.Message(intersection_id, False, False))
-                message.spat_available = True
-
+        # Return a list containing only the Message objects
         return list(messages.values())
 
     # Called from the GraphQL client if the IntersectionResult is requested
